@@ -1,0 +1,64 @@
+object {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 51px;
+    padding-bottom: 51px;
+}
+
+h1, h2, h3, h4 {
+    font-weight: bold;
+}
+
+h1, h2 {
+    font-size: 28px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20mm;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+h4 {
+    font-size: 14px;
+}
+
+ul {
+    list-style: decimal;
+}
+
+#pdf_teil_a li, #pdf_teil_b li, #pdf_teil_c li {
+    page-break-inside: avoid;
+}
+
+#pdf_teil_a, #pdf_teil_b, #pdf_teil_c, #pdf_title {
+    padding: 20mm;
+    min-height: 225mm;
+    position: relative;
+}
+
+#pdf_teil_a, #pdf_teil_b, #pdf_teil_c {
+    page-break-before: always;
+}
+
+#pdf_teil_a li, #pdf_teil_b li, section div {
+    padding-bottom: 15mm;
+
+}
+
+#pdf_teil_b ul ul {
+    list-style: none;
+    padding-bottom: 15mm;
+}
+
+#pdf_teil_b ul ul li {
+    padding-bottom: 0;
+}
+
+.centered {
+    text-align: center;
+}

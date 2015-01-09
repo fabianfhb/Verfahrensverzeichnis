@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "css/report.css" %}"/>{% endblock %}
+{% block object %}
+    <object data="{{ file }}#toolbar=1&amp;navpanes=0&amp;scrollbar=1&amp;page=1&amp;view=FitH" type="application/pdf">
+
+        <p>It appears you don't have a PDF plugin for this browser. No biggie... you can <a href="/pdf/sample.pdf">click
+            here to download the PDF file.</a></p>
+
+    </object>
+    {% comment %}<embed width="100%"  name="plugin" src="{{ file }}"  type="application/pdf">
+    {% endcomment %}{% comment %}<section id="pdf_title">
+        <div class="centered">
+            <h1>Verfahrensverzeichnis</h1>
+
+            <p>Beschreibung des einzelnen Verfahrens nach § 8 DSG NRW</p>
+        </div>
+        <div class="centered"><b style="padding-right: 40mm;">Lfd. Nr.:</b> <br> {{ vz.get_meldeart_display }}</div>
+        <div class="centered">{{ vz.verfahrenbestimmung }}</div>
+
+        <div style="
+    width: 40%;
+    position: absolute;
+    bottom: 20mm;
+    left: 20mm;">
+
+            <p style="margin-bottom: 15mm;">Datenverarbeitende Stelle</p>
+            <hr>
+            Datum <span style="display:inline-block; width: 15mm;"></span> Unterschrift
+        </div>
+
+        <div style="
+    width: 40%;
+    position: absolute;
+    bottom: 20mm;
+    right: 20mm;">
+
+            <p style="margin-bottom: 15mm;">Berhördlicher Datenschutzbeauftragter</p>
+            <hr>
+            Datum <span style="display:inline-block; width: 15mm;"></span> Unterschrift
+
+        </div>
+    </section>
+    <section id="pdf_teil_a">
+    <h2>Teil A Allgemeine Angaben</h2>
+    <ul>
+    <li>
+        <h4>Name und Anschrift der datenverarbeitenden Stelle</h4>
+
+        <p>{{ vz.allgemeineangaben }}</p>
+
+    </li>
+    <li>
+        <h4>Zweckbestimmung und Rechtsgrundlage der Datenverarbeitung</h4>
+
+        <p>{{ vz.allgemeineangaben.zweckbestimmung }}</p>
+
+        <p>{{ vz.allgemeineangaben.verfahrenBezeichnung }}</p>
+
+        <p>{{ vz.allgemeineangaben.rechtsgrundlage }}</p>
+
+    </li>
+    <li>
+        <h4>Arten der gespeicherten Daten</h4>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Lfd. Nr.</th>
+                <th>Feldbezeichnung</th>
+                <th>Feldinhalt</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for datum in vz.verfahren.all %}
+                <tr>
+                    <td scope="row">{{ datum.lfdNr }}</td>
+                    <td>{{ datum.bezeichnung }}</td>
+                    <td>
+                        {% for inhalt in datum.inhalt.all %}
+                            {{ inhalt }},
+                        {% endfor %}
+                    </td>
+                </tr>
+
+            {% endfor %}
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            </tbody>
+        </table>
+        <p>Besonders geschützte Daten nach § 4 Abs. 3 DSG NRW:</p>
+
+        <p>
+            {% for lfd in vz.verfahren.all %}
+                {% if lfd.geschuetzt %}
+                    {{ lfd.lfdNr }},
+                {% endif %}
+            {% endfor %}</p>
+
+    </li>
+    <li>
+        <h4>Kreis der Betroffenen</h4>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Lfd. Nr.</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for lfd in vz.verfahren.all %}
+                <tr>
+                    <td>{{ lfd.lfdNr }}</td>
+                    <td>{% for kreis in lfd.betroffenenKreis.all %}
+                        {{ kreis.bezeichnung }}
+                    {% endfor %}</td>
+                </tr>
+
+            {% endfor %}
+
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            </tbody>
+
+        </table>
+    </li>
+    <li>
+        <h4>Zugriffsberechtigte Personen oder Personengruppen</h4>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Lfd. Nr.</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for lfd in vz.verfahren.all %}
+                <tr>
+                    <td>{{ lfd.lfdNr }}</td>
+                    <td>{% for person in lfd.personen.all %}
+                        {{ person }},
+                    {% endfor %}{% for gruppe in lfd.gruppen.all %}
+                        {{ gruppe }},
+                    {% endfor %}</td>
+                </tr>
+
+            {% endfor %}
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            </tbody>
+
+        </table>
+    </li>
+    <li>
+        <h4>Erhalt und Weitergabe von Daten</h4>
+        <ul>
+            <li>
+                <h5>6.1 Herkunft der Daten bei erhaltenen Daten</h5>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Lfd. Nr. aus 3</th>
+                        <th>Herkunft</th>
+                        <th>Periodizität</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for lfd in vz.verfahren.all %}
+                        {% if lfd.herkunft %}
+                            <tr>
+                                <td>{{ lfd.lfdNr }}</td>
+                                <td>{{ lfd.herkunft }}</td>
+                                <td>{{ lfd.periodizitaet }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li>
+                <h5>6.2 Empfänger der Daten bei weitergeleiteten Daten</h5>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Lfd. Nr. aus 3</th>
+                        <th>Empfänger</th>
+                        <th>Periodizität</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for lfd in vz.verfahren.all %}
+                        {% if lfd.empfaenger %}
+                            {% for emp in lfd.empfaenger.all %}
+                                {% if not emp.empfaenger.is_drittstaat %}
+                                    <tr>
+                                        <td>{{ lfd.lfdNr }}</td>
+                                        <td>{{ emp.empfaenger }}</td>
+                                        <td>{{ emp.periodizitaet }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                    {% endfor %}
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li>
+                <h5>Beabsichtigte Datenübermittlung in "Drittstaaten"</h5>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Lfd. Nr. aus 3</th>
+                        <th>Empfänger</th>
+                        <th>Periodizität</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for lfd in vz.verfahren.all %}
+                        {% if lfd.empfaenger %}
+                            {% for emp in lfd.empfaenger.all %}
+                                {% if emp.empfaenger.is_drittstaat %}
+                                    <tr>
+                                        <td>{{ lfd.lfdNr }}</td>
+                                        <td>{{ emp.empfaenger }}</td>
+                                        <td>{{ emp.periodizitaet }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                    {% endfor %}
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <h4>Fristen für Sperrung und Löschung</h4>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Lfd. Nr. aus 3</th>
+                <th>Sperrfrist</th>
+                <th>Löschfrist</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for lfd in vz.verfahren.all %}
+                {% if lfd.sperrfrist or lfd.loeschfrist %}
+                    <tr>
+                        <td>{{ lfd.lfdNr }}</td>
+                        <td>{{ lfd.sperrfrist }}</td>
+                        <td>{{ lfd.loeschfrist }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            </tbody>
+        </table>
+    </li>
+
+    </ul>
+    </section>
+    <section id="pdf_teil_b">
+        <h2>Teil B Sicherheitskonzept</h2>
+        <ul>
+            <li>
+                <h4>Technische und organisatorische Maßnahmen</h4>
+                <ul>
+                {% regroup vz.sicherheitskonzept.massnahmen.all by get_bedrohung_display as m_list %}
+                    {% for m in m_list %}
+                       <li>{{ m.grouper }}
+                        <ul>
+                            {% for item in m.list %}
+                              <li>{{ item.bezeichnung }}</li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+                        <hr>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <h4>Technik des Verfahrens</h4>
+                <h4>{{ vz.sicherheitskonzept.verfahren.get_typ_display }}-Verfahren</h4>
+                {% if vz.sicherheitskonzept.verfahren == 'EINZELPLATZ' %}
+                <p>Betriebssystem: {{ vz.sicherheitskonzept.verfahren.betriebssystem.bezeichnung }}</p>
+                {% else %}
+                <p>Client (Datenendgerät): {{ vz.sicherheitskonzept.verfahren.get_client_display }}</p>
+                    <hr>
+                    <p>Betriebssystem des Servers: {{ vz.sicherheitskonzept.verfahren.betriebssystem.bezeichnung }}</p>
+                    <hr>
+                    <p>{% if vz.sicherheitskonzept.verfahren == 'CLIENTSERVER' %}Client-Server{% else %}Client-Großrechner{% endif %}-Kommunikation erfolgt über:</p><p>{{ vz.sicherheitskonzept.verfahren.get_kommunikation_display }}</p>
+                    <hr>
+                    <p>Datenspeicherung erfolgt auf {{ vz.sicherheitskonzept.verfahren.get_datenspeicherung_display }}</p>
+                    <p>Art der gespeicherten Daten (lfd. Nr. aus Teil A Nr.3): {% for d in vz.verfahren.all %}{{ d.lfdNr }}, {% endfor %}</p>
+                {% endif %}
+                <p></p>
+
+            </li>
+            <li>
+                <h4>Eingesetzte Software (einschließlich Standardverfahren)</h4>
+                   <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Version/Stand/Datum</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for s in vz.sicherheitskonzept.software.all %}
+                <tr>
+                    <td>{{ s.bezeichnung }}</td>
+                    <td>{{ s.version }}</td>
+                </tr>
+
+                {% endfor %}
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                </tbody>
+            </table>
+            </li>
+
+
+        </ul>
+    </section>
+    <section id="pdf_teil_c">
+        <h2>Teil C Begründetes Ergebnis der Vorabkontrolle gemäß §10 Abs. 3 DSG NRW</h2>
+        <p>{{ vz.ergebnisvorabkontrolle.ergebnis }}</p>
+    </section>{% endcomment %}
+{% endblock %}
